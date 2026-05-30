@@ -1,49 +1,75 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import SearchBar from '../components/SearchBar'
-import useCountries from '../hooks/useCountries'
+import CountryCard from '../components/CountryCard'
 
 function Home() {
   const [query, setQuery] = useState('')
-  const { countries, loading, error } = useCountries(query)
-  const hasQuery = query.trim().length > 0
+  const [countries, setCountries] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    const trimmedQuery = query.trim()
+
+    if (!trimmedQuery) {
+      setCountries([])
+      setError(null)
+      setLoading(false)
+      return
+    }
+
+    const controller = new AbortController()
+    const timer = setTimeout(() => {
+      setLoading(true)
+      setError(null)
+
+      fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(trimmedQuery)}`, {
+        signal: controller.signal,
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('No countries found.')
+          }
+          return response.json()
+        })
+        .then((data) => {
+          setCountries(data)
+          setError(null)
+        })
+        .catch((fetchError) => {
+          if (fetchError.name === 'AbortError') return
+          setCountries([])
+          setError('No countries found.')
+        })
+        .finally(() => {
+          setLoading(false)
+        })
+    }, 400)
+
+    return () => {
+      clearTimeout(timer)
+      controller.abort()
+    }
+  }, [query])
+
+  const trimmedQuery = query.trim()
 
   return (
     <section className="home">
       <SearchBar query={query} onQueryChange={setQuery} />
 
-      {!hasQuery && (
-        <p className="home__placeholder">Search for a country by name to start exploring.</p>
+      {loading && <p className="home__status">Loading...</p>}
+      {error && <p className="home__status home__status--error">{error}</p>}
+      {!loading && !error && countries.length === 0 && !trimmedQuery && (
+        <p className="home__status">Start searching to explore countries.</p>
       )}
 
-      {hasQuery && loading && <p className="home__status">Loading countries…</p>}
-      {hasQuery && error && <p className="home__error">{error}</p>}
-      {hasQuery && !loading && !error && countries.length === 0 && (
-        <p className="home__status">No countries matched “{query}”.</p>
-      )}
-
-      {countries.length > 0 && (
-        <ul className="country-list">
+      {!loading && !error && countries.length > 0 && (
+        <div className="cards-grid">
           {countries.map((country) => (
-            <li key={country.cca3} className="country-card">
-              <Link
-                to={`/country/${encodeURIComponent(country.name.common)}`}
-                className="country-card__link"
-              >
-                <img
-                  src={country.flags.svg || country.flags.png}
-                  alt={`Flag of ${country.name.common}`}
-                  className="country-card__flag"
-                />
-                <div className="country-card__content">
-                  <h2>{country.name.common}</h2>
-                  <p>{country.region}</p>
-                  <p>{country.population.toLocaleString()} people</p>
-                </div>
-              </Link>
-            </li>
+            <CountryCard key={country.cca3} country={country} />
           ))}
-        </ul>
+        </div>
       )}
     </section>
   )

@@ -51,85 +51,68 @@
   outline-offset: 2px;
 }
 
-.home__placeholder,
 .home__status,
-.home__error,
+.home__status--error,
 .favourites-page__back,
 .country-page__back {
   margin-top: 1.25rem;
   color: #475569;
 }
 
-.home__error {
+.home__status--error {
   color: #b91c1c;
 }
 
-.country-list {
-  list-style: none;
-  margin: 1.5rem 0 0;
-  padding: 0;
+.cards-grid {
   display: grid;
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
 }
 
-.country-card {
+.card {
+  display: block;
   background: #ffffff;
-  border: 1px solid #e2e8f0;
   border-radius: 1rem;
   overflow: hidden;
-}
-
-.country-card__link {
-  display: flex;
-  gap: 1rem;
   text-decoration: none;
   color: inherit;
-  align-items: center;
-  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+  transition: transform 200ms ease, box-shadow 200ms ease;
 }
 
-.country-card__flag {
-  width: 96px;
-  height: 64px;
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+}
+
+.card__flag {
+  width: 100%;
+  height: 160px;
   object-fit: cover;
-  border-radius: 0.75rem;
-  flex-shrink: 0;
+  display: block;
 }
 
-.country-card__content h2 {
-  margin: 0 0 0.35rem;
+.card__body {
+  padding: 1.25rem;
+}
+
+.card__name {
+  margin: 0 0 0.85rem;
   font-size: 1.1rem;
+  color: #111827;
 }
 
-.country-card__content p {
-  margin: 0.25rem 0;
+.card__body p {
+  margin: 0.35rem 0;
   color: #475569;
+  font-size: 0.95rem;
 }
 
-.country-card__favourite-row {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-}
-
-.remove-favourite-button,
-.favorite-button {
-  border: 0;
-  padding: 0.75rem 1rem;
-  border-radius: 9999px;
-  background-color: #2563eb;
-  color: #ffffff;
-  cursor: pointer;
+.card__body p span {
+  color: #0f172a;
   font-weight: 600;
-}
-
-.remove-favourite-button {
-  background-color: #ef4444;
-}
-
-.favorite-button:hover,
-.remove-favourite-button:hover {
-  opacity: 0.95;
 }
 
 .country-page__card {
