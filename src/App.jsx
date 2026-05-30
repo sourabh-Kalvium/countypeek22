@@ -13,7 +13,7 @@ function App() {
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/country/:name" element={<CountryPage />} />
+          <Route path="/country/:code" element={<CountryPage />} />
           <Route path="/favourites" element={<Favourites />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -1,70 +1,24 @@
-import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-
-const API_URL = 'https://restcountries.com/v3.1'
+import { useParams, useNavigate } from 'react-router-dom'
+import useCountry from '../hooks/useCountry'
+import '../styles/App.css'
 
 function CountryPage() {
-  const { name } = useParams()
-  const [country, setCountry] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [isFavorite, setIsFavorite] = useState(false)
-
-  useEffect(() => {
-    if (!name) return
-
-    const controller = new AbortController()
-    const encodedName = encodeURIComponent(name)
-    const url = `${API_URL}/name/${encodedName}?fullText=true&fields=name,cca3,flags,region,subregion,population,capital,languages,currencies`
-
-    setLoading(true)
-    setError(null)
-
-    fetch(url, { signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Unable to load country details.')
-        }
-        return response.json()
-      })
-      .then((data) => {
-        const fetchedCountry = data[0]
-        setCountry(fetchedCountry)
-        const stored = JSON.parse(localStorage.getItem('countryPeekFavourites') || '[]')
-        setIsFavorite(stored.includes(fetchedCountry.name.common))
-      })
-      .catch((fetchError) => {
-        if (fetchError.name !== 'AbortError') {
-          setError(fetchError.message)
-        }
-      })
-      .finally(() => setLoading(false))
-
-    return () => controller.abort()
-  }, [name])
-
-  const toggleFavorite = () => {
-    if (!country) return
-
-    const countryName = country.name.common
-    const stored = JSON.parse(localStorage.getItem('countryPeekFavourites') || '[]')
-    const next = stored.includes(countryName)
-      ? stored.filter((item) => item !== countryName)
-      : [...stored, countryName]
-
-    localStorage.setItem('countryPeekFavourites', JSON.stringify(next))
-    setIsFavorite(!isFavorite)
-  }
+  const { code } = useParams()
+  const navigate = useNavigate()
+  const { country, loading, error } = useCountry(code)
 
   if (loading) {
-    return <div className="country-page"><p>Loading country details…</p></div>
+    return (
+      <div className="country-page">
+        <p className="page-status">Loading country details…</p>
+      </div>
+    )
   }
 
   if (error) {
     return (
       <div className="country-page">
-        <p className="home__error">{error}</p>
-        <Link to="/">Back to search</Link>
+        <p className="page-status page-status--error">{error}</p>
       </div>
     )
   }
@@ -72,52 +26,80 @@ function CountryPage() {
   if (!country) {
     return (
       <div className="country-page">
-        <p>Country data is not available.</p>
-        <Link to="/">Back to search</Link>
+        <p className="page-status">Country data is not available.</p>
       </div>
     )
   }
 
-  const languages = country.languages ? Object.values(country.languages).join(', ') : 'Unknown'
-  const currencies = country.currencies
-    ? Object.values(country.currencies)
-        .map((currency) => `${currency.name} (${currency.symbol || ''})`)
-        .join(', ')
-    : 'Unknown'
+  const {
+    name,
+    flags,
+    population,
+    region,
+    subregion,
+    capital,
+    languages,
+    currencies,
+    borders,
+  } = country
+
+  const languageList = languages ? Object.values(languages) : []
+  const currencyList = currencies ? Object.values(currencies).map((c) => c.name) : []
 
   return (
     <section className="country-page">
-      <Link to="/" className="country-page__back">
-        ← Back to search
-      </Link>
-      <div className="country-page__card">
+      <button className="back-btn" onClick={() => navigate(-1)}>
+        ← Back
+      </button>
+
+      <div className="country-page__layout">
         <img
-          src={country.flags.svg || country.flags.png}
-          alt={`Flag of ${country.name.common}`}
+          src={flags.svg || flags.png}
+          alt={`Flag of ${name.common}`}
           className="country-page__flag"
         />
-        <div>
-          <div className="country-page__header">
-            <h1>{country.name.common}</h1>
-            <button className="favorite-button" onClick={toggleFavorite}>
-              {isFavorite ? 'Remove from favourites' : 'Add to favourites'}
-            </button>
+
+        <div className="country-page__info">
+          <h2 className="country-page__name">{name.common}</h2>
+          <p className="country-page__official">{name.official}</p>
+
+          <div className="country-page__details">
+            <div>
+              <p>
+                <strong>Population:</strong> {population.toLocaleString()}
+              </p>
+              <p>
+                <strong>Region:</strong> {region}
+              </p>
+              <p>
+                <strong>Subregion:</strong> {subregion}
+              </p>
+            </div>
+            <div>
+              <p>
+                <strong>Capital:</strong> {capital?.[0] ?? 'N/A'}
+              </p>
+              <p>
+                <strong>Languages:</strong> {languageList.join(', ') || 'N/A'}
+              </p>
+              <p>
+                <strong>Currencies:</strong> {currencyList.join(', ') || 'N/A'}
+              </p>
+            </div>
           </div>
-          <p className="country-page__meta">{country.region} · {country.subregion}</p>
-          <ul className="country-page__details">
-            <li>
-              <strong>Capital:</strong> {country.capital?.join(', ') || 'No capital'}
-            </li>
-            <li>
-              <strong>Population:</strong> {country.population.toLocaleString()}
-            </li>
-            <li>
-              <strong>Languages:</strong> {languages}
-            </li>
-            <li>
-              <strong>Currencies:</strong> {currencies}
-            </li>
-          </ul>
+
+          {borders && borders.length > 0 && (
+            <div className="border-section">
+              <p><strong>Bordering countries:</strong></p>
+              <div className="border-list">
+                {borders.map((borderCode) => (
+                  <span key={borderCode} className="border-badge">
+                    {borderCode}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>
