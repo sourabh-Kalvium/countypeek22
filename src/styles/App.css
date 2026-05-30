@@ -26,7 +26,10 @@
   text-decoration: underline;
 }
 
-.home {
+.home,
+.country-page,
+.favourites-page,
+.not-found {
   padding: 1.5rem 1.25rem;
 }
 
@@ -48,13 +51,132 @@
   outline-offset: 2px;
 }
 
-.home__placeholder {
+.home__placeholder,
+.home__status,
+.home__error,
+.favourites-page__back,
+.country-page__back {
   margin-top: 1.25rem;
   color: #475569;
 }
 
-.not-found,
-.country-page,
-.favourites-page {
-  padding: 1.5rem 1.25rem;
+.home__error {
+  color: #b91c1c;
+}
+
+.country-list {
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.country-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.country-card__link {
+  display: flex;
+  gap: 1rem;
+  text-decoration: none;
+  color: inherit;
+  align-items: center;
+  padding: 1rem;
+}
+
+.country-card__flag {
+  width: 96px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 0.75rem;
+  flex-shrink: 0;
+}
+
+.country-card__content h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.1rem;
+}
+
+.country-card__content p {
+  margin: 0.25rem 0;
+  color: #475569;
+}
+
+.country-card__favourite-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+}
+
+.remove-favourite-button,
+.favorite-button {
+  border: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 9999px;
+  background-color: #2563eb;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.remove-favourite-button {
+  background-color: #ef4444;
+}
+
+.favorite-button:hover,
+.remove-favourite-button:hover {
+  opacity: 0.95;
+}
+
+.country-page__card {
+  display: grid;
+  gap: 1.5rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.country-page__flag {
+  width: min(100%, 480px);
+  border-radius: 1rem;
+}
+
+.country-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.country-page__meta {
+  color: #475569;
+  margin: 0.5rem 0 1rem;
+}
+
+.country-page__details {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.country-page__details li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.country-page__details li:last-child {
+  border-bottom: none;
+}
+
+.favourites-page__back,
+.country-page__back {
+  display: inline-block;
+  text-decoration: none;
+  color: #2563eb;
 }
