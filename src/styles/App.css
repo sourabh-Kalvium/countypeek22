@@ -155,6 +155,27 @@
   font-weight: 600;
 }
 
+.fav-btn {
+  margin-top: 1rem;
+  padding: 0.7rem 0.95rem;
+  border: 1px solid var(--input-border);
+  border-radius: 0.75rem;
+  background: var(--button-bg);
+  color: var(--button-text);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.fav-btn:hover {
+  opacity: 0.95;
+}
+
+.fav-btn--saved {
+  border-color: #f87171;
+  background: rgba(248, 113, 113, 0.15);
+  color: #b91c1c;
+}
+
 .country-page__card {
   display: grid;
   gap: 1.5rem;
